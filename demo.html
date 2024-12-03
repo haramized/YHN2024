@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>자동차 피하기 게임</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #game-container {
+      position: relative;
+      width: 300px;
+      height: 600px;
+      background-color: gray;
+      overflow: hidden;
+    }
+    .lane {
+      position: absolute;
+      width: 100px;
+      height: 100%;
+      border-right: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .lane:nth-child(1) { left: 0; }
+    .lane:nth-child(2) { left: 100px; }
+    .lane:nth-child(3) { left: 200px; }
+    .player, .car {
+      position: absolute;
+      width: 80px;
+      height: 60px;
+      left: 10px;
+      background-color: yellow;
+      border-radius: 5px;
+    }
+    .car {
+      background-color: skyblue;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 20px;
+    }
+    #game-over {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="score">Score: 0</div>
+    <div id="game-over"; style="text-align:center">Game Over! Press F5 to Restart</div>
+  </div>
+
+  <script>
+    const gameContainer = document.getElementById("game-container");
+    const scoreElement = document.getElementById("score");
+    const gameOverElement = document.getElementById("game-over");
+    const lanes = [0, 100, 200];
+    let playerLane = 1;
+    let player = createPlayer();
+    let cars = [];
+    let score = 0;
+    let speed = 15; // 기본 속도
+    let gameRunning = true;
+
+    function createPlayer() {
+      const playerDiv = document.createElement("div");
+      playerDiv.classList.add("player");
+      playerDiv.style.bottom = "10px";
+      playerDiv.style.left = `${lanes[playerLane]}px`;
+      gameContainer.appendChild(playerDiv);
+      return playerDiv;
+    }
+
+    function createCar() {
+      if (!gameRunning) return;
+      const carLane = Math.floor(Math.random() * 3);
+      const carDiv = document.createElement("div");
+      carDiv.classList.add("car");
+      carDiv.style.top = "0px";
+      carDiv.style.left = `${lanes[carLane]}px`;
+      gameContainer.appendChild(carDiv);
+      cars.push({ element: carDiv, lane: carLane });
+
+      setTimeout(createCar, 1000 / speed * 15); // 1초 간격으로 새로운 자동차 생성
+    }
+
+    function movePlayer(direction) {
+      if (direction === "left" && playerLane > 0) {
+        playerLane--;
+      } else if (direction === "right" && playerLane < 2) {
+        playerLane++;
+      }
+      player.style.left = `${lanes[playerLane]}px`;
+    }
+
+    function moveCars() {
+      if (!gameRunning) return;
+
+      for (let i = cars.length - 1; i >= 0; i--) {
+        const car = cars[i];
+        const carElement = car.element;
+        let carTop = parseInt(carElement.style.top);
+        carTop += 30; // 30픽셀 이동
+        carElement.style.top = `${carTop}px`;
+
+        // 자동차가 화면 아래로 나가면 제거
+        if (carTop >= 600) {
+          gameContainer.removeChild(carElement);
+          cars.splice(i, 1);
+          score++;
+          scoreElement.textContent = `Score: ${score}`;
+        }
+
+        // 충돌 체크
+        if (
+          carTop >= 540 && carTop < 600 && // 플레이어와 같은 높이에 있는 경우
+          car.lane === playerLane
+        ) {
+          endGame();
+        }
+      }
+
+      // 다음 이동 예약
+      setTimeout(moveCars, 1000 / speed);
+    }
+
+    function updateSpeed() {
+		speed = 15 + ~~(score / 10) * 5;
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOverElement.style.display = "flex";
+	  document.querySelector('#game-over').innerText += '\nScore: ' + score + '';
+    }
+
+    function startGame() {
+      moveCars();
+      createCar();
+
+      // 점수 기반으로 속도 업데이트
+      const scoreUpdater = setInterval(() => {
+        if (!gameRunning) {
+          clearInterval(scoreUpdater);
+          return;
+        }
+        updateSpeed();
+      }, 250); // 0.5초마다 점수 확인 및 속도 조정
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") movePlayer("left");
+      if (e.key === "ArrowRight") movePlayer("right");
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
