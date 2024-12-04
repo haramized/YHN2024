@@ -154,14 +154,21 @@
     function endGame() {
 		gameRunning = false;
 		gameOverElement.style.display = "flex";
-		gameOverElement.innerHTML = `Game Over!<br>Score: ${score}<br><button id="restart-button">Restart</button>`;
-		
+		gameOverElement.innerHTML = `
+			<div style="text-align: center;">
+				<p>Game Over!<br>Score: ${score}</p>
+				<button id="restart-button" style="padding: 0.25em; font-size: 20px; margin-top: 10px;">Restart</button>
+			</div>
+		`;
+
 		// 새로고침 버튼 이벤트 리스너 추가
 		const restartButton = document.getElementById("restart-button");
 		restartButton.addEventListener("click", () => {
 			location.reload(); // 페이지 새로고침
-    });
-}
+		});
+	}
+
+
 
     function startGame() {
       moveCars();
