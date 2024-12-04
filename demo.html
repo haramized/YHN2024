@@ -1,6 +1,5 @@
 <!-- 모바일 환경에서는 세 점을 누른 뒤에 다운로드 버튼 누르시면 됩니다. YEWON KIM, former PRISTIN member, 홧팅!! ->
 <!-- 제작자: haramized (Haram Kim). 이 게임의 저작권은 haramized에게 있습니다. -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,10 +152,16 @@
     }
 
     function endGame() {
-      gameRunning = false;
-      gameOverElement.style.display = "flex";
-	  document.querySelector('#game-over').innerText += '\nScore: ' + score + '';
-    }
+		gameRunning = false;
+		gameOverElement.style.display = "flex";
+		gameOverElement.innerHTML = `Game Over!<br>Score: ${score}<br><button id="restart-button">Restart</button>`;
+		
+		// 새로고침 버튼 이벤트 리스너 추가
+		const restartButton = document.getElementById("restart-button");
+		restartButton.addEventListener("click", () => {
+			location.reload(); // 페이지 새로고침
+    });
+}
 
     function startGame() {
       moveCars();
