@@ -1,3 +1,4 @@
+<!-- 모바일 환경에서는 세 점을 누른 뒤에 다운로드 버튼 누르시면 됩니다. YEWON KIM, former PRISTIN member, 홧팅!! ->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,7 +146,7 @@
     }
 
     function updateSpeed() {
-		speed = 15 + ~~(score / 10) * 5;
+		speed = 15 + ~~(score / 5) * 5;
     }
 
     function endGame() {
@@ -172,7 +173,19 @@
       if (e.key === "ArrowLeft") movePlayer("left");
       if (e.key === "ArrowRight") movePlayer("right");
     });
+	    // 터치 영역을 구분하기 위한 변수
+    const touchZone = gameContainer.getBoundingClientRect();
 
+    // 터치 이벤트 핸들러
+    gameContainer.addEventListener("touchstart", (e) => {
+        const touchX = e.touches[0].clientX;
+        if (touchX < touchZone.left + touchZone.width / 2) {
+            movePlayer("left");
+        } else {
+            movePlayer("right");
+        }
+    });
+	
     startGame();
   </script>
 </body>
